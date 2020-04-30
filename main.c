@@ -10,6 +10,7 @@
 #define GET_SYS_TIME 334
 #define PRINT_SYS_MESG 335
 #define TIME_QUANTUM 500
+#define QUEUE_SIZE 1000
 struct process{
 	char pname[10];
 	int readyT;
@@ -59,6 +60,9 @@ int cmp(const void *a, const void *b){
 
 // for RR
 int count = 0;
+int queue[QUEUE_SIZE];
+int head = 0;
+int tail = 0;
 
 int schedule(char policy[], struct process *processes,int running, int finish_task_num, int create_task_num){
 	if(strcmp(policy,"FIFO") == 0){
@@ -71,11 +75,20 @@ int schedule(char policy[], struct process *processes,int running, int finish_ta
 			count+=1;
 			return running;
 		}else{
+			//finish one round and push into queue
+			if(count == 500 && processes[running].execT > 0){
+				queue[tail] = running;
+				tail = (tail+1) % QUEUE_SIZE;
+			}
+			//find next task
 			count = 1;
-			for (int i = 1; i <= create_task_num; ++i)
-				if(processes[(running+i)%create_task_num].execT > 0 )
-					return (running+i)%create_task_num;
-			return -1;
+			if(head == tail)
+				return -1;
+			else{
+				int next = queue[head];
+				head = (head+1) % QUEUE_SIZE;
+				return next;
+			}
 		}
 	}else if(strcmp(policy,"SJF") == 0){
 		if(processes[running].execT != 0)
@@ -164,6 +177,8 @@ int main(int argc, char const *argv[])
 			}
 			// let child wait until it's their time to run
 			set_idle(pid);
+			queue[tail] = create_task_num;
+			tail = (tail+1) % QUEUE_SIZE;
 			pidtable[create_task_num] = pid;
 			create_task_num++;
 			continue;
