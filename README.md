@@ -1,7 +1,6 @@
 # OS_Project1
-## How to Run
-After ```make```, you might need ```sudo ./main``` to run the code.
 ## Description
+
 In this project, I try to simulate CPU scheduling with 4 different policies.
 - first in first out
 - round robin
@@ -38,13 +37,16 @@ TAG PID ST FT
 //FT - the finish time of this process in the format seconds.nanoseconds.
 ```
 ## Implementation
-**I only use one CPU throughout the project.**
-At the beginning of each time unit, scheduler will fork the process once it's ready and determine which process should be running at this time unit. Then schedular will yield the CPU usage to that particular process.  
+
+**I only use one CPU throughout the project.**  
+At the beginning of each time unit, scheduler will fork the process when it's ready and determine which process should be running at this time unit. Then schedular will yield the CPU usage to that particular process. 
+At the end of the time unit, the process consuming CPU will give it back to scheduler.  
 I use sched_setscheduler() to make the actual CPU context switch between scheduler and processes.
+
 ### Time Measurement
 I implement the kernel function GET_SYS_TIME to get the system time. (See /kernel_files for more details)  
-It can be used to check the correctness of scheduler.  
-- 500 time units is about 0.75sec in my machine. 
+It can be used to check whether scheduler is working properly.  
+- 500 time units is about 0.75sec on my machine. 
 
 ## How to Run
 You might need sudo ./main to run the code.
